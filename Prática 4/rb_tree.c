@@ -2,7 +2,8 @@
 
 /* Valor de sentinela, indica que chegamos em alguma folha ou entao
  a raiz da arvore */
-Node NIL_NODE;
+Node NIL_NODE = {.key = 213980,
+                 .color = BLACK};
 
 /* Ponteiro para o valor de sentinela */
 Node *NIL_PTR = &NIL_NODE;
@@ -24,8 +25,8 @@ Node* new_node(int key) {
     if(NULL == ret_val) return NULL;
     ret_val->key = key;
     ret_val->color = RED;
-    ret_val->left = NULL;
-    ret_val->right = NULL;
+    ret_val->left = NIL_PTR;
+    ret_val->right = NIL_PTR;
     ret_val->parent = NULL;
     return ret_val;
 }
@@ -42,30 +43,81 @@ Node* new_node(int key) {
 * O novo Node inserido em caso de sucesso, NULL caso nao
 * seja possivel inserir o novo valor
 */
-Node* tree_insert(Node** T, int key){
-    Node* r = *T;
+Node* rb_insert(Node** T, int key){
 
-    if(!r) {
-        /*r = malloc(sizeof(Node));
-        r->key = key;
-        r->left = NULL;
-        //r->right = NULL;*/
-        r = (new_node(key));
-        T = &r;
-        return *T;
-        //return *T;
-    }
-/*
-    if(key > r->key) {
-        r->right = tree_insert(&(r->right), key);
+    if(NULL == (*T)){
+        (*T) = new_node(key);
+        PAR(*T) = NIL_PTR;
+        return (*T);
     }
 
-    if(key < r->key) {
-        r->left = tree_insert(&(r->left), key);
+    Node* y = NIL_PTR;
+    Node* x = *T;
+    Node* z = new_node(key);
+
+    while((x) != (NIL_PTR)) {
+        y = x;
+        if(key < y->key){
+            x = x->left;
+        } else {
+            x = x->right;
+        }
+    }
+    PAR(z) = y;
+    if(y == NIL_PTR){
+        (*T) = z;
+    } else if(key < y->key) {
+        y->left = z;
+    } else {
+        y->right = z;
     }
 
-    return r;
-    */
+    z->left = NIL_PTR;
+    z->right = NIL_PTR;
+    z->color = RED;
+    rb_insert_fixup(T, (&z));
+    return (*T);
+}
+
+Node* rb_insert_fixup(Node** T, Node** z){
+    Node* y;
+    while(PAR(*z)->color == RED){
+        if(PAR(*z) == GPAR(*z)->left){
+            y = GPAR(*z)->right;
+            if(y->color == RED){
+                PAR(*z)->color = BLACK;
+                y->color = BLACK;
+                GPAR(*z)->color = RED;
+            } else {
+                if((*z) == PAR(*z)->right) {
+                    (*z) = PAR(*z);
+                    left_rotate(T, (*z));
+                }
+                PAR(*z)->color = BLACK;
+                GPAR(*z)->color = RED;
+                right_rotate(T, (*z));
+            }
+        } else {
+            y = GPAR(*z)->left;
+            if(y->color == RED){
+
+                printf("%p, %d\n\n",y);
+
+                //PAR(*z)->color = BLACK;
+                //y->color = BLACK;
+                //GPAR(*z)->color = RED;
+            } /*else {
+                if((*z) == PAR(*z)->left) {
+                    (*z) = PAR(*z);
+                    right_rotate(T, (*z));
+                }
+                PAR(*z)->color = BLACK;
+                GPAR(*z)->color = RED;
+                left_rotate(T, (*z));
+            }*/
+        }
+    }
+    (*T)->color = BLACK;
 }
 
 /**
