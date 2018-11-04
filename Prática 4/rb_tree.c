@@ -3,7 +3,9 @@
 /* Valor de sentinela, indica que chegamos em alguma folha ou entao
  a raiz da arvore */
 Node NIL_NODE = {.key = 213980,
-                 .color = BLACK};
+                 .color = BLACK/*,
+                 .left = &NIL_NODE,
+                 .right = &NIL_NODE*/};
 
 /* Ponteiro para o valor de sentinela */
 Node *NIL_PTR = &NIL_NODE;
@@ -44,10 +46,10 @@ Node* new_node(int key) {
 * seja possivel inserir o novo valor
 */
 Node* rb_insert(Node** T, int key){
-
     if(NULL == (*T)){
         (*T) = new_node(key);
         PAR(*T) = NIL_PTR;
+        (*T)->color = BLACK;
         return (*T);
     }
 
@@ -83,7 +85,7 @@ Node* rb_insert_fixup(Node** T, Node** z){
     Node* y;
     while(PAR(*z)->color == RED){
         if(PAR(*z) == GPAR(*z)->left){
-            y = GPAR(*z)->right;
+            y = GPAR(*z)->right; // nil
             if(y->color == RED){
                 PAR(*z)->color = BLACK;
                 y->color = BLACK;
@@ -94,19 +96,18 @@ Node* rb_insert_fixup(Node** T, Node** z){
                     left_rotate(T, (*z));
                 }
                 PAR(*z)->color = BLACK;
-                GPAR(*z)->color = RED;
+                if(GPAR(*z) != NIL_PTR) {
+                    GPAR(*z)->color = RED;
+                }////////////////////////////////////////
                 right_rotate(T, (*z));
             }
         } else {
             y = GPAR(*z)->left;
             if(y->color == RED){
-
-                printf("%p, %d\n\n",y);
-
-                //PAR(*z)->color = BLACK;
-                //y->color = BLACK;
-                //GPAR(*z)->color = RED;
-            } /*else {
+                PAR(*z)->color = BLACK;
+                y->color = BLACK;
+                GPAR(*z)->color = RED;
+            } else {
                 if((*z) == PAR(*z)->left) {
                     (*z) = PAR(*z);
                     right_rotate(T, (*z));
@@ -114,7 +115,7 @@ Node* rb_insert_fixup(Node** T, Node** z){
                 PAR(*z)->color = BLACK;
                 GPAR(*z)->color = RED;
                 left_rotate(T, (*z));
-            }*/
+            }
         }
     }
     (*T)->color = BLACK;
@@ -129,13 +130,35 @@ Node* rb_insert_fixup(Node** T, Node** z){
 *
 */
 void left_rotate(Node** T, Node* x) {
-    Node* y = x->right;
+    
+    
+    /*Node* y = x->right;
     Node* b = y->left;
+
+    if(PAR(x)->right == x){
+        PAR(x)->right = y;
+    } else {
+        PAR(x)->left = y;
+    }
+
     y->parent = x->parent;
     x->parent = y;
     x->right = b;
     b->parent = x;
-    y->left = x;
+    y->left = x;*/
+	Node *node, *tmp;
+	
+	node = x;
+	tmp = node->right;
+	
+	//printf("[No desbalanceado: %d]\n[Rotacao: SE]\n[x=%d y=%d z=%d]\n", node->RA, node->RA, node->pRight->RA, node->pRight->pRight->RA);
+	
+	node->right = tmp->left;
+	tmp->left = node;
+	
+	//updateHeight(node);
+	x = tmp;
+	
 }
 
 /**
@@ -147,13 +170,44 @@ void left_rotate(Node** T, Node* x) {
 *
 */
 void right_rotate(Node** T, Node* y) {
-    Node* x = y->left;
-    Node* b = x->right;
-    x->parent = y->parent;
+    /*Node* x = y->left; //nil
+    Node* b = x->right; //NULL
+
+    if(PAR(y)->right == y){
+        PAR(y)->right = x;
+    } else {
+        PAR(y)->left = x;
+    }
+
+    if(x != NIL_PTR) {
+        x->parent = y->parent;
+    }
     y->parent = x;
-    y->left = b;
+    y->left = b ? b : NIL_PTR;
     b->parent = y;
-    x->right = y;
+    x->right = y;*/
+
+    Node* tmp;
+    tmp = y->right;
+    /* Turn y's left sub-tree into x's right sub-tree */
+    y->right = tmp->left;
+    if ( tmp->left != NULL )
+        tmp->left->parent = y;
+    /* y's new parent was x's parent */
+    tmp->parent = y->parent;
+    /* Set the parent to point to y instead of x */
+    /* First see whether we're at the root */
+    if ( y->parent == NULL ) (*T) = y;
+    else
+        if ( y == (y->parent)->left )
+            /* x was on the left of its parent */
+            y->parent->left = tmp;
+        else
+            /* x must have been on the right */
+            y->parent->right = tmp;
+    /* Finally, put x on y's left */
+    tmp->left = y;
+    y->parent = tmp;
 }
 
 
@@ -184,9 +238,9 @@ void flip_color(Node** T, Node* x){
 }
 
 void erd (Node *r) {
-    if (r != NULL) {
+    if (r != NIL_PTR) {
         erd(r->left);
-        printf("%d ", r->key);
+        printf("%d - %d\n", r->key, r->color);
         erd(r->right);
     }
 }

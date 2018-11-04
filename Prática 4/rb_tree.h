@@ -13,7 +13,7 @@ typedef enum {RED, BLACK} Color;
 
 typedef struct Node{
     int          key;
-    Color         color;
+    Color        color;
     struct Node *left;
     struct Node *right;
     struct Node *parent;
@@ -22,5 +22,6 @@ typedef struct Node{
 void left_rotate(Node** T, Node* x);
 void right_rotate(Node** T, Node* x);
 Node* rb_insert_fixup(Node** T, Node** z);
+Node* randomTree(int nNodes);
 
 #endif // RB_TREE_H_INCLUDED
