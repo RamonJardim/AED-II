@@ -1,5 +1,7 @@
 #include "tn_trie.h"
 
+using namespace std;
+
 void print_helper(tn_trie_node* root, string prefix);
 bool has_no_children(tn_trie_node* node);
 
@@ -46,9 +48,12 @@ int insert(tn_trie_node* root, string key) {
 			break;
 		}
 	}
-	if (index < 0) return -1;
+	if (index < 0) {
+		return -1;
+	}
 	else {
 		x->is_end_of_word = true;
+		//cout << "ok\n";
 		return 0;	
 	}
 }
@@ -78,7 +83,7 @@ bool has_no_children(tn_trie_node* node){
 }
 
 void print_all(tn_trie_node* root){	
-	string prefix = "/**/ -- /**/";
+	string prefix = "";
 	print_helper(root, prefix);
 }
 
@@ -98,24 +103,18 @@ void print_helper(tn_trie_node* root, string prefix){
 	}
 }
 
-void erd(tn_trie_node* n) {
-	cout << "www\n";
-}
-
 void tn_suggest(tn_trie_node* root, string query){
 	tn_trie_node* x = root;
 	if(root == NULL) return;
 	int index;
 	for(int i = 0; i < query.length(); i++){
 		index = get_index(query[i]);
-		if(index < 0) break;
-		if(x->children[index] == NULL) return;
+		if(index < 0 or x->children[index] == NULL) return;
 		x = x->children[index];
 	}
-	if(index >= 0 && x != NULL && x->is_end_of_word){
-		cout << query;
+	if(x->is_end_of_word){
+		cout << query << "\n";
 	} else {
 		print_helper(x, query);
 	}
 }
-
