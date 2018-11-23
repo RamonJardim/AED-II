@@ -26,13 +26,11 @@ int main()
         insert(root, keys[i]); 
     }
   
-    /*print_search(root, keys[0]);
+    print_search(root, keys[0]);
     print_search(root, keys[2]);
     print_search(root, "nao.existe.0123456789");
     print_search(root, "outro.erro");
     cout << "++++++++++++++++" << endl;
-    print_all(root);*/
-
-    tn_suggest(root, "teste");
+    print_all(root);
 
 } 
