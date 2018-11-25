@@ -147,12 +147,58 @@ bt_node* bt_split(bt_node *x) {
 
     A funcao deve devolver o novo no y.
     */
-    bt_node* y = malloc(sizeof(bt_node*));
-    y->is_leaf = x->is_leaf;
-    y->t = x->t;
+    bt_node* y = bt_new_node(x->t, x->is_leaf);
+    y->num_keys = x->t - 1;
+    x->num_keys = x->t - 1;
+
+    if(x->is_leaf) {
+        y->keys = &(x->keys[x->t+1]);
+    } else {
+        y->keys = &(x->keys[x->t]);
+    }
+
+    return y;
 }
 
-int main(){
+bt_node* busca(bt_node *N, int key) {
+    if(N == NULL) {
+        return NULL;
+    }
 
-    return 0;
+    int indice = -1;
+    do {
+        if(N->keys[indice] == key) {
+            return N;
+        }
+        indice++;
+    } while(N->keys[indice] <= key && indice != sizeof(N->keys)/sizeof(int));
+
+    if(indice == sizeof(N->keys)/sizeof(int)) {
+        return NULL;
+    }
+
+    return busca(N->children[indice], key);
+
+}
+
+bt_node* search(bt_tree *T, int key) {
+    if(T == NULL) {
+        return NULL;
+    }
+
+    return busca(T->root, key);
+}
+
+
+
+int main(){
+    bt_tree* T = new_tree(4);
+    bt_insert(T, 6);
+    bt_insert(T, 12);
+    bt_insert(T, 25);
+    bt_insert(T, 14);
+    bt_insert(T, 88);
+    bt_insert(T, 99);
+    bt_insert(T, 1);
+    printf("%d\n", search(T, 88)->keys[0]); // deve ter problema no split
 }
